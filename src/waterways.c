@@ -39,7 +39,9 @@ static void draw_line(Map *map, int x0, int y0, int x1, int y1,
 
 void generate_waterways(Map *map)
 {
-    int num_rivers = 1 + map_rand_range(map, 0, 2); /* 1 or 2 */
+    /* map_rand_range(map, 0, 2) returns 0 or 1  ([lo, hi) excludes hi=2)
+     * so num_rivers is either 1 or 2.                                    */
+    int num_rivers = 1 + map_rand_range(map, 0, 2);
 
     for (int r = 0; r < num_rivers; r++) {
         int sx, sy, tx, ty;

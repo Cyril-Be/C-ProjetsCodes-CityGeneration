@@ -26,10 +26,10 @@ void generate_parks(Map *map)
                 continue;
             }
 
-            /* Random pocket parks in residential blocks */
+            /* Random pocket parks in residential blocks — 1/25 ≈ 4% chance */
             if (cell->type     == CELL_BUILDING &&
                 cell->district == DISTRICT_RESIDENTIAL &&
-                map_rand_range(map, 0, 25) == 0) {
+                map_rand_range(map, 0, 25) == 0) {  /* [0, 25) → hits 0 ~4 % */
                 cell->type   = CELL_PARK;
                 cell->height = 0;
             }
