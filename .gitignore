@@ -1,0 +1,4 @@
+# Build artefacts
+city_gen
+src/*.o
+*.ppm
