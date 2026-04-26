@@ -7,14 +7,15 @@
  */
 #include "city.h"
 
-void map_init(Map *map, unsigned int seed)
+void map_init(Map *map, const CityParams *params)
 {
-    map->width    = MAP_WIDTH;
-    map->height   = MAP_HEIGHT;
-    map->rng      = seed;
+    map->width     = MAP_WIDTH;
+    map->height    = MAP_HEIGHT;
+    map->rng       = params->seed;
+    map->city_type = params->city_type;
     memset(map->grid, 0, sizeof(map->grid));
 
-    /* City centre: slightly offset from the geometric middle */
+    /* City centre starts at the geometric centre; districts.c will shift it */
     map->center_x = map->width  / 2;
     map->center_y = map->height / 2;
 }
@@ -32,7 +33,6 @@ unsigned int map_rand(Map *map)
 
 float map_randf(Map *map)
 {
-    /* Returns a value in [0, 1) */
     return (float)(map_rand(map) >> 1) / (float)0x7FFFFFFFu;
 }
 
