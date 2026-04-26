@@ -1,10 +1,10 @@
 # C-ProjetsCodes-CityGeneration
 
-Generateur procédural de plans de ville écrit en C — version 2.0.
+Generateur procédural de plans de ville écrit en C — version 3.0 (interface SDL2).
 
-Le programme produit à chaque fois une ville unique et réaliste grâce à une
-interface interactive qui permet de choisir le type de ville, la graine, les
-paramètres des cours d'eau et la densité des bâtiments.
+Le programme produit à chaque fois une ville unique et réaliste dans une
+fenêtre graphique native Ubuntu, avec génération visible en direct étape par
+étape.
 
 ---
 
@@ -41,15 +41,20 @@ paramètres des cours d'eau et la densité des bâtiments.
 
 ---
 
-## Build
+## Build (Ubuntu)
 
-Nécessite `gcc` et `make`.
+Nécessite `gcc`, `make`, `pkg-config` et `libsdl2-dev`.
+
+```sh
+sudo apt-get update
+sudo apt-get install -y build-essential pkg-config libsdl2-dev
+```
 
 ```sh
 make
 ```
 
-## Lancement (interface interactive)
+## Lancement (interface graphique)
 
 ```sh
 ./city_gen
@@ -59,20 +64,19 @@ make
 |---|---|
 | `t` | Changer le type de ville (Médiéval ↔ Moderne) |
 | `r` | Nouvelle graine aléatoire |
-| `s` | Saisir une graine précise |
 | `n` | Cycle du nombre de rivières (Auto / 1 / 2 / 3) |
 | `l` | Cycle de la largeur des rivières (Étroite / Normale / Large) |
 | `d` | Cycle de la densité des bâtiments (Éparse / Normale / Dense) |
-| `g` | Générer / Regénérer |
-| `v` | Afficher dans le terminal (ANSI 256 couleurs) |
+| `g` / `Espace` | Générer / Regénérer |
 | `p` | Sauvegarder en image PPM (`city_<seed>.ppm`, 1280 × 640 px) |
-| `q` | Quitter |
+| `q` / `Échap` | Quitter |
 
 ---
 
 ## Sortie
 
-- **Terminal** : carte colorée ANSI-256 (160 × 80 caractères).
+- **Fenêtre SDL2** : rendu temps réel avec progression visible des 6 étapes
+  (waterways, districts, roads, bridges, buildings, parks) et HUD intégré.
 - **PPM** : image 1280 × 640 px (échelle 8×), avec contours de bâtiments,
   effet de bordure sur les routes et dégradé sur l'eau.
   Ouvrez `city_<seed>.ppm` dans n'importe quel visionneur d'images.
