@@ -3,13 +3,15 @@
  *
  * Algorithm
  * ---------
- * 1. Pick 1 or 2 rivers.
- * 2. For each river choose a start point on one map edge and an end point
- *    on a different edge (so rivers always cross the map).
- * 3. Create 4 intermediate control points along the straight line between
- *    the endpoints and add random jitter so the river meanders.
+ * 1. Number of rivers is taken from params (0 = auto → 1 or 2).
+ * 2. For each river choose a start edge and a different end edge.
+ * 3. Build 6 intermediate control points with random perpendicular jitter
+ *    (more control points than v1 → smoother, more natural meanders).
  * 4. Trace Bresenham segments between consecutive control points, drawing
- *    each cell with a width of 1 or 2 extra cells on each side.
+ *    each cell with a width determined by params->river_width.
+ *
+ * For medieval cities the waterways are intentionally slightly wider and
+ * more meandering, reflecting the historical role of rivers as city-founders.
  */
 #include "city.h"
 
@@ -37,50 +39,63 @@ static void draw_line(Map *map, int x0, int y0, int x1, int y1,
     }
 }
 
-void generate_waterways(Map *map)
+void generate_waterways(Map *map, const CityParams *params)
 {
-    /* map_rand_range(map, 0, 2) returns 0 or 1  ([lo, hi) excludes hi=2)
-     * so num_rivers is either 1 or 2.                                    */
-    int num_rivers = 1 + map_rand_range(map, 0, 2);
+    int medieval = (map->city_type == CITY_MEDIEVAL);
+
+    /* Determine number of rivers */
+    int num_rivers;
+    if (params->num_rivers > 0)
+        num_rivers = params->num_rivers;
+    else
+        num_rivers = 1 + map_rand_range(map, 0, 2); /* 1 or 2 */
+
+    /* River half-width from params (1 = ±1, 2 = ±2, 3 = ±3) */
+    int base_half_w = params->river_width; /* 1–3 */
 
     for (int r = 0; r < num_rivers; r++) {
         int sx, sy, tx, ty;
 
         /* Choose flow axis: top→bottom or left→right */
         if (map_rand(map) & 1) {
-            sx = map_rand_range(map, 15, map->width  - 15);
+            sx = map_rand_range(map, 20, map->width  - 20);
             sy = 0;
-            tx = map_rand_range(map, 15, map->width  - 15);
+            tx = map_rand_range(map, 20, map->width  - 20);
             ty = map->height - 1;
         } else {
             sx = 0;
-            sy = map_rand_range(map, 10, map->height - 10);
+            sy = map_rand_range(map, 12, map->height - 12);
             tx = map->width - 1;
-            ty = map_rand_range(map, 10, map->height - 10);
+            ty = map_rand_range(map, 12, map->height - 12);
         }
 
-        /* Build control points */
-        int num_ctrl = 4;
-        int ptx[6], pty[6];
+        /* 6 intermediate control points for a natural meander */
+        int num_ctrl = 6;
+        int ptx[8], pty[8];
         ptx[0]            = sx; pty[0]            = sy;
         ptx[num_ctrl + 1] = tx; pty[num_ctrl + 1] = ty;
+
+        /* Medieval rivers meander more */
+        int jitter_x = medieval ? 20 : 14;
+        int jitter_y = medieval ? 12 :  8;
 
         for (int i = 1; i <= num_ctrl; i++) {
             float t  = (float)i / (float)(num_ctrl + 1);
             int   bx = (int)(sx + t * (tx - sx));
             int   by = (int)(sy + t * (ty - sy));
 
-            ptx[i] = bx + map_rand_range(map, -14, 15);
-            pty[i] = by + map_rand_range(map, -8,   9);
+            ptx[i] = bx + map_rand_range(map, -jitter_x, jitter_x + 1);
+            pty[i] = by + map_rand_range(map, -jitter_y, jitter_y + 1);
 
-            /* Clamp so river stays inside the map */
-            if (ptx[i] < 2)               ptx[i] = 2;
-            if (ptx[i] >= map->width  - 2) ptx[i] = map->width  - 3;
-            if (pty[i] < 2)               pty[i] = 2;
-            if (pty[i] >= map->height - 2) pty[i] = map->height - 3;
+            /* Keep inside map */
+            if (ptx[i] < 3)               ptx[i] = 3;
+            if (ptx[i] >= map->width  - 3) ptx[i] = map->width  - 4;
+            if (pty[i] < 3)               pty[i] = 3;
+            if (pty[i] >= map->height - 3) pty[i] = map->height - 4;
         }
 
-        int half_w = 1 + map_rand_range(map, 0, 2); /* 1 or 2 extra cells */
+        /* Width: medieval rivers are a touch wider */
+        int half_w = base_half_w + (medieval ? map_rand_range(map, 0, 2) : 0);
 
         for (int i = 0; i <= num_ctrl; i++)
             draw_line(map,
