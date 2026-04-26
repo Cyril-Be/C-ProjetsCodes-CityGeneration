@@ -17,9 +17,9 @@
 #define ZOOM_STEP        1.15f
 #define DEFAULT_ZOOM     1.45f
 #define TITLE_BUFFER_SIZE 320
-#define RENDER_SCALE_QUALITY "2"
+#define RENDER_SCALE_QUALITY_LINEAR "2"
 #define BASE_PAN_PIXELS   60.0f
-#define GRAIN_DIVISOR    220.0f
+#define GRAIN_NOISE_DIVISOR 220.0f
 #define WAVE1_X_OFFSET      1
 #define WAVE1_Y_OFFSET      2
 #define WAVE2_X_OFFSET      2
@@ -342,7 +342,7 @@ static void render_cell_detail(SDL_Renderer *renderer, const Cell *cell, CityTyp
     uint32_t h = hash2(gx, gy, 0x9e3779b9u);
     RGB base = cell_colour(cell, city_type);
 
-    float grain = 0.92f + (float)(h & 31u) / GRAIN_DIVISOR;
+    float grain = 0.92f + (float)(h & 31u) / GRAIN_NOISE_DIVISOR;
     base = rgb_mul(base, grain);
     draw_tile_base(renderer, cx, cy, base);
 
@@ -526,7 +526,7 @@ static void update_window_title(SDL_Window *window, const AppState *app)
 
 int run_gui_app(void)
 {
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, RENDER_SCALE_QUALITY);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, RENDER_SCALE_QUALITY_LINEAR);
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "SDL init error: %s\n", SDL_GetError());
