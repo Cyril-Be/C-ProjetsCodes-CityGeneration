@@ -16,10 +16,11 @@
 #define MAX_ZOOM         7.00f
 #define ZOOM_STEP        1.15f
 #define DEFAULT_ZOOM     1.45f
-#define TITLE_BUFFER_SIZE 320
-#define RENDER_SCALE_QUALITY_LINEAR "2"
+#define TITLE_BUFFER_SIZE 512
+#define RENDER_SCALE_QUALITY_ANISOTROPIC "2"
 #define BASE_PAN_PIXELS   60.0f
 #define GRAIN_NOISE_DIVISOR 220.0f
+#define MIN_WINDOW_WIDTH_FOR_2X_TEXT 1100
 #define WAVE1_X_OFFSET      1
 #define WAVE1_Y_OFFSET      2
 #define WAVE2_X_OFFSET      2
@@ -463,7 +464,7 @@ static void render_frame(SDL_Renderer *renderer, SDL_Texture *map_tex, AppState 
     SDL_Rect sep = {0, hud_y, win_w, 2};
     SDL_RenderFillRect(renderer, &sep);
 
-    int text_scale = (win_w >= 1100) ? 2 : 1;
+    int text_scale = (win_w >= MIN_WINDOW_WIDTH_FOR_2X_TEXT) ? 2 : 1;
 
     SDL_Color white = {235, 238, 242, 255};
     SDL_Color info  = {140, 195, 255, 255};
@@ -526,7 +527,7 @@ static void update_window_title(SDL_Window *window, const AppState *app)
 
 int run_gui_app(void)
 {
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, RENDER_SCALE_QUALITY_LINEAR);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, RENDER_SCALE_QUALITY_ANISOTROPIC);
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "SDL init error: %s\n", SDL_GetError());
