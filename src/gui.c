@@ -19,6 +19,11 @@
 #define TITLE_BUFFER_SIZE 320
 #define RENDER_SCALE_QUALITY "2"
 #define BASE_PAN_PIXELS   60.0f
+#define GRAIN_DIVISOR    220.0f
+#define WAVE1_X_OFFSET      1
+#define WAVE1_Y_OFFSET      2
+#define WAVE2_X_OFFSET      2
+#define WAVE2_Y_OFFSET      6
 
 typedef struct {
     CityParams params;
@@ -337,15 +342,15 @@ static void render_cell_detail(SDL_Renderer *renderer, const Cell *cell, CityTyp
     uint32_t h = hash2(gx, gy, 0x9e3779b9u);
     RGB base = cell_colour(cell, city_type);
 
-    float grain = 0.92f + (float)(h & 31u) / 220.0f;
+    float grain = 0.92f + (float)(h & 31u) / GRAIN_DIVISOR;
     base = rgb_mul(base, grain);
     draw_tile_base(renderer, cx, cy, base);
 
     if (cell->type == CELL_WATER) {
         RGB top = rgb_mul(base, 1.08f);
         SDL_SetRenderDrawColor(renderer, top.r, top.g, top.b, 255);
-        SDL_Rect wave1 = {cx + 1, cy + 2 + (int)(h & 1u), MAP_CELL_PX - 2, 1};
-        SDL_Rect wave2 = {cx + 2, cy + 6 + (int)((h >> 1) & 1u), MAP_CELL_PX - 4, 1};
+        SDL_Rect wave1 = {cx + WAVE1_X_OFFSET, cy + WAVE1_Y_OFFSET + (int)(h & 1u), MAP_CELL_PX - 2, 1};
+        SDL_Rect wave2 = {cx + WAVE2_X_OFFSET, cy + WAVE2_Y_OFFSET + (int)((h >> 1) & 1u), MAP_CELL_PX - 4, 1};
         SDL_RenderFillRect(renderer, &wave1);
         SDL_RenderFillRect(renderer, &wave2);
     } else if (cell->type == CELL_ROAD || cell->type == CELL_BRIDGE) {
@@ -513,7 +518,7 @@ static void update_window_title(SDL_Window *window, const AppState *app)
 {
     char title[TITLE_BUFFER_SIZE];
     snprintf(title, sizeof(title),
-             "City Generator SDL | %s | Seed=%u | Zoom=%.2fx | G generate, Wheel +/- zoom, Arrows move, F fullscreen",
+             "City Generator SDL | %s | Seed=%u | Zoom=%.2fx | G generate, Molette/+/- zoom, Arrows move, F fullscreen",
              app->params.city_type == CITY_MEDIEVAL ? "Medieval" : "Modern",
              app->params.seed, app->zoom);
     SDL_SetWindowTitle(window, title);
@@ -595,8 +600,8 @@ int run_gui_app(void)
             if (event.type == SDL_QUIT) {
                 running = 0;
             } else if (event.type == SDL_MOUSEWHEEL) {
-                int mx = win_w / 2;
-                int my = map_h / 2;
+                int mx = 0;
+                int my = 0;
                 SDL_GetMouseState(&mx, &my);
                 if (my < map_h) {
                     if (event.wheel.y > 0) {
