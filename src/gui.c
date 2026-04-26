@@ -17,6 +17,8 @@
 #define ZOOM_STEP        1.15f
 #define DEFAULT_ZOOM     1.45f
 #define TITLE_BUFFER_SIZE 320
+#define RENDER_SCALE_QUALITY "2"
+#define BASE_PAN_PIXELS   60.0f
 
 typedef struct {
     CityParams params;
@@ -464,15 +466,16 @@ static void render_frame(SDL_Renderer *renderer, SDL_Texture *map_tex, AppState 
     SDL_Color warn  = {245, 190, 95, 255};
 
     char line[256];
-    snprintf(line, sizeof(line), "TYPE[T]: %s    SEED[R]: %u    ZOOM[WHEEL,+,-]: %.2fx",
+    snprintf(line, sizeof(line), "TYPE[T]: %s    SEED[R]: %u    ZOOM[MOLETTE,+,-]: %.2fx",
              app->params.city_type == CITY_MEDIEVAL ? "MEDIEVAL" : "MODERN",
              app->params.seed, app->zoom);
     draw_text(renderer, 10, hud_y + 10, text_scale, white, line);
 
-    snprintf(line, sizeof(line), "RIVERS[N]: %s   WIDTH[L]: %s   DENSITY[D]: %s   FULLSCREEN[F]",
+    snprintf(line, sizeof(line), "RIVERS[N]: %s   WIDTH[L]: %s   DENSITY[D]: %s   FULLSCREEN[F]: %s",
              river_count_label(app->params.num_rivers),
              river_width_label(app->params.river_width),
-             density_label(app->params.density));
+             density_label(app->params.density),
+             app->fullscreen ? "ON" : "OFF");
     draw_text(renderer, 10, hud_y + 10 + 12 * text_scale, text_scale, white, line);
 
     if (app->generating) {
@@ -518,7 +521,7 @@ static void update_window_title(SDL_Window *window, const AppState *app)
 
 int run_gui_app(void)
 {
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, RENDER_SCALE_QUALITY);
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "SDL init error: %s\n", SDL_GetError());
@@ -609,7 +612,7 @@ int run_gui_app(void)
                 }
             } else if (event.type == SDL_KEYDOWN) {
                 SDL_Keycode key = event.key.keysym.sym;
-                float pan_step = 60.0f / app.zoom;
+                float pan_step = BASE_PAN_PIXELS / app.zoom;
                 switch (key) {
                     case SDLK_ESCAPE:
                     case SDLK_q:
