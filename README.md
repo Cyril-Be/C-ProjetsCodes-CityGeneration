@@ -67,6 +67,10 @@ make
 | `n` | Cycle du nombre de rivières (Auto / 1 / 2 / 3) |
 | `l` | Cycle de la largeur des rivières (Étroite / Normale / Large) |
 | `d` | Cycle de la densité des bâtiments (Éparse / Normale / Dense) |
+| `+` / `-` / molette | Zoom avant / arrière |
+| `0` | Réinitialiser le zoom et recentrer la vue |
+| `Flèches` | Déplacer la caméra |
+| `f` / `F11` | Basculer en plein écran |
 | `g` / `Espace` | Générer / Regénérer |
 | `p` | Sauvegarder en image PPM (`city_<seed>.ppm`, 1280 × 640 px) |
 | `q` / `Échap` | Quitter |
