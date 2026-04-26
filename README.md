@@ -1,6 +1,6 @@
 # C-ProjetsCodes-CityGeneration
 
-Generateur procédural de plans de ville écrit en C — version 3.0 (interface SDL2).
+Générateur procédural de plans de ville écrit en C — version 3.0 (interface SDL2).
 
 Le programme produit à chaque fois une ville unique et réaliste dans une
 fenêtre graphique native Ubuntu, avec génération visible en direct étape par
