@@ -1,6 +1,7 @@
 #include "city.h"
 #include <SDL2/SDL.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdint.h>
 #include <time.h>
 
@@ -14,6 +15,8 @@
 #define MIN_ZOOM         0.70f
 #define MAX_ZOOM         7.00f
 #define ZOOM_STEP        1.15f
+#define DEFAULT_ZOOM     1.45f
+#define TITLE_BUFFER_SIZE 320
 
 typedef struct {
     CityParams params;
@@ -505,7 +508,7 @@ static void render_frame(SDL_Renderer *renderer, SDL_Texture *map_tex, AppState 
 
 static void update_window_title(SDL_Window *window, const AppState *app)
 {
-    char title[320];
+    char title[TITLE_BUFFER_SIZE];
     snprintf(title, sizeof(title),
              "City Generator SDL | %s | Seed=%u | Zoom=%.2fx | G generate, Wheel +/- zoom, Arrows move, F fullscreen",
              app->params.city_type == CITY_MEDIEVAL ? "Medieval" : "Modern",
@@ -568,7 +571,7 @@ int run_gui_app(void)
     app.step_index = 0;
     app.last_step_ticks = 0;
     app.last_export[0] = '\0';
-    app.zoom = 1.45f;
+    app.zoom = DEFAULT_ZOOM;
     app.cam_x = 0.0f;
     app.cam_y = 0.0f;
     app.fullscreen = 0;
@@ -670,7 +673,7 @@ int run_gui_app(void)
                         break;
                     case SDLK_0:
                     case SDLK_KP_0:
-                        app.zoom = 1.45f;
+                        app.zoom = DEFAULT_ZOOM;
                         center_camera(&app, win_w, map_h);
                         break;
                     case SDLK_LEFT:
