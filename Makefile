@@ -1,6 +1,8 @@
 CC      = gcc
-CFLAGS  = -Wall -Wextra -Wpedantic -O2 -Iinclude
-LDFLAGS = -lm
+SDL2_CFLAGS := $(shell pkg-config --cflags sdl2 2>/dev/null)
+SDL2_LIBS   := $(shell pkg-config --libs sdl2 2>/dev/null)
+CFLAGS  = -Wall -Wextra -Wpedantic -O2 -Iinclude $(SDL2_CFLAGS)
+LDFLAGS = -lm $(SDL2_LIBS)
 
 SRCDIR  = src
 SRCS    = $(wildcard $(SRCDIR)/*.c)

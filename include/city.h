@@ -87,5 +87,6 @@ void generate_parks(Map *map);                               /* step 6 */
 /* ── Rendering ──────────────────────────────────────────────────────────── */
 void render_terminal(const Map *map);
 void render_ppm(const Map *map, const char *filename);
+int  run_gui_app(void);
 
 #endif /* CITY_H */
